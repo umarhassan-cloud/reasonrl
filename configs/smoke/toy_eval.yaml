@@ -1,0 +1,10 @@
+base: eval_tiny.yaml
+data:
+  train_files: [data/sample/toy_add_train.jsonl]
+  eval_files: [data/sample/toy_add_eval.jsonl]
+eval:
+  checkpoints: {sft: runs/toy/sft, sft+grpo: runs/toy/grpo, sft+dpo: runs/toy/dpo}
+  baseline: sft
+  max_new_tokens: 64
+  output_path: runs/toy/eval/results.json
+  contamination: {ngram: 8, threshold: 0.5, mask_numbers: false}

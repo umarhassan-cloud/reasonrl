@@ -1,0 +1,9 @@
+base: ../dpo.yaml
+name: smoke
+device: cpu
+output_dir: runs/smoke
+model: {name_or_path: tiny-random, dtype: float32, gradient_checkpointing: false}
+data: {max_prompt_len: 512, max_target_len: 256}
+optim: {lr: 1.0e-4, warmup_steps: 0}
+dpo: {init_from: runs/smoke/sft, samples_per_prompt: 4, max_new_tokens: 96, epochs: 1, batch_size: 4,
+      gold_as_chosen: true, save_dir: runs/smoke/dpo}

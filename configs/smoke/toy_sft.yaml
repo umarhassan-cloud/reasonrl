@@ -1,0 +1,11 @@
+# Toy addition (CPU): SFT deliberately under-trained so RL has headroom.
+base: sft_tiny.yaml
+name: toy
+data:
+  train_files: [data/sample/toy_add_train.jsonl]
+  eval_files: [data/sample/toy_add_eval.jsonl]
+  max_target_len: 64
+sft: {max_steps: 120, batch_size: 16, eval_every: 40, save_dir: runs/toy/sft}
+output_dir: runs/toy
+eval:
+  contamination: {ngram: 8, threshold: 0.5, mask_numbers: false}   # same template by design; facts are disjoint

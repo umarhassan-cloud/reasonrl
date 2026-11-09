@@ -1,0 +1,48 @@
+# Stage 2b: DPO from the same SFT checkpoint, on pairs labelled by the same verifier.
+name: dpo
+seed: 42
+device: auto
+output_dir: runs
+log_every: 5
+
+model:
+  name_or_path: Qwen/Qwen2.5-0.5B-Instruct
+  dtype: bfloat16
+  gradient_checkpointing: true
+
+data:
+  train_files: [data/sample/math_train.jsonl, data/sample/code_train.jsonl]
+  eval_files: [data/sample/math_eval.jsonl, data/sample/code_eval.jsonl]
+  max_prompt_len: 384
+  max_target_len: 512
+
+optim:
+  lr: 5.0e-7
+  warmup_steps: 10
+  scheduler: cosine
+
+reward:                         # identical to grpo.yaml -> identical preference signal
+  correctness_weight: 1.0
+  format_weight: 0.1
+  format_mode: strict
+  strict_extraction: true
+  hacking_guards: true
+
+dpo:
+  init_from: runs/sft/final
+  beta: 0.1
+  loss_type: sigmoid
+  label_smoothing: 0.0
+  epochs: 2
+  batch_size: 8
+  grad_accum: 1
+  samples_per_prompt: 8         # == grpo.group_size: same sampling budget per prompt
+  pairs_per_prompt: 2
+  pair_strategy: correct_vs_incorrect
+  gold_as_chosen: false         # keep DPO on-distribution for a fair comparison
+  max_new_tokens: 384
+  temperature: 1.0
+  save_dir: runs/dpo/final
+
+eval:
+  contamination: {ngram: 8, threshold: 0.5, mask_numbers: true}

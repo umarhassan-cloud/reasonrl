@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    env:
+      HF_HUB_OFFLINE: "1"          # tests must never download models
+      TRANSFORMERS_OFFLINE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install (CPU-only torch)
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e ".[dev]"
+      - name: Lint
+        run: ruff check src scripts tests
+      - name: Unit tests
+        run: pytest -q
+      - name: Contamination gate on sample data
+        run: |
+          python scripts/check_contamination.py \
+            --train data/sample/math_train.jsonl data/sample/code_train.jsonl \
+            --eval data/sample/math_eval.jsonl data/sample/code_eval.jsonl \
+            --mask-numbers --fail-above 0.20
+      - name: Ablation configs resolve
+        run: python scripts/run_ablations.py experiments/ablations/*.yaml --dry-run

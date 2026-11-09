@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+.env
+
+# experiment outputs (checkpoints, logs); curated curves live in experiments/curves
+runs/
+wandb/
+experiments/ablations/results/ckpt/
+experiments/ablations/results/eval/
+*.safetensors
+*.bin
+*.pt
+
+data/hf/
+.DS_Store
+.idea/
+.vscode/

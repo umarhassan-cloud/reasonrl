@@ -1,0 +1,17 @@
+description: >
+  Does the KL penalty to the SFT reference matter? Removing it (as in DAPO) frees
+  memory (no reference forward) and speeds up reward climbing, but we expect
+  faster drift: longer completions, more format collapse / reward hacking, and a
+  wider train-reward vs held-out-accuracy gap.
+base: ../../configs/grpo.yaml
+name: abl_kl
+variants:
+  kl_0.04:
+    grpo.kl_coef: 0.04
+  kl_0.01:
+    grpo.kl_coef: 0.01
+  no_kl:
+    grpo.kl_coef: 0.0
+  no_kl_no_guards:          # the configuration in which we first observed hacking
+    grpo.kl_coef: 0.0
+    reward.hacking_guards: false

@@ -1,0 +1,23 @@
+description: >
+  Reward design. Correctness-only vs + format shaping, and two deliberately
+  hackable variants that reproduce failure modes documented in PAPER.md §6:
+  a naive "tags present" format reward (empty-answer hack) and lenient
+  "last number" extraction (prompt-copy hack), both with guards disabled.
+base: ../../configs/grpo.yaml
+name: abl_reward
+variants:
+  correctness_only:
+    reward.format_weight: 0.0
+  with_format:
+    reward.format_weight: 0.1
+  format_gated:
+    reward.format_weight: 0.1
+    reward.require_format_for_correctness: true
+  naive_format_unguarded:
+    reward.format_mode: naive
+    reward.format_weight: 0.5
+    reward.hacking_guards: false
+  lenient_extraction_unguarded:
+    reward.strict_extraction: false
+    reward.format_weight: 0.0
+    reward.hacking_guards: false

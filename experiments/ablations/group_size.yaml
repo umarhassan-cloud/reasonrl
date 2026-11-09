@@ -1,0 +1,17 @@
+description: >
+  Group size G controls the variance of the group-relative baseline and the
+  chance a group contains at least one correct sample (pass@G). We compare G=4
+  vs G=8 at a FIXED sample budget of 64 completions per step (so G=4 sees 2x
+  more prompts), plus G=4 at half the budget to separate the two effects.
+base: ../../configs/grpo.yaml
+name: abl_group
+variants:
+  g4_budget64:
+    grpo.group_size: 4
+    grpo.prompts_per_step: 16
+  g8_budget64:
+    grpo.group_size: 8
+    grpo.prompts_per_step: 8
+  g4_budget32:
+    grpo.group_size: 4
+    grpo.prompts_per_step: 8

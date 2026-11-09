@@ -1,0 +1,54 @@
+# Stage 2a: GRPO from the SFT checkpoint with verifiable rewards.
+name: grpo
+seed: 42
+device: auto
+output_dir: runs
+log_every: 1
+
+model:
+  name_or_path: Qwen/Qwen2.5-0.5B-Instruct
+  dtype: bfloat16
+  gradient_checkpointing: true
+
+data:
+  train_files: [data/sample/math_train.jsonl, data/sample/code_train.jsonl]
+  eval_files: [data/sample/math_eval.jsonl, data/sample/code_eval.jsonl]
+  max_prompt_len: 384
+
+optim:
+  lr: 1.0e-6
+  warmup_steps: 10
+  scheduler: constant
+  max_grad_norm: 1.0
+
+reward:
+  correctness_weight: 1.0
+  format_weight: 0.1          # small shaping term; correctness dominates
+  format_mode: strict
+  strict_extraction: true
+  hacking_guards: true
+  hacking_penalty: 0.0
+  code_timeout_s: 3.0
+
+grpo:
+  init_from: runs/sft/final
+  steps: 200
+  prompts_per_step: 8
+  group_size: 8               # 64 completions / step
+  max_new_tokens: 384
+  temperature: 1.0
+  top_p: 1.0
+  ppo_epochs: 1               # mu = 1 -> strictly on-policy (ratio == 1 at the update)
+  minibatch_size: 64
+  clip_eps: 0.2
+  kl_coef: 0.04               # beta in DeepSeekMath; set 0 for the no-KL ablation
+  kl_estimator: k3
+  adv_mode: std
+  loss_agg: seq_mean
+  eval_every: 25
+  save_dir: runs/grpo/final
+
+eval:
+  max_new_tokens: 384
+  batch_size: 32
+  contamination: {ngram: 8, threshold: 0.5, mask_numbers: true}

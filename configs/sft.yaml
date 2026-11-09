@@ -1,0 +1,40 @@
+# Stage 1: SFT on curated math + code reasoning traces.
+name: sft
+seed: 42
+device: auto
+output_dir: runs
+log_every: 10
+
+model:
+  name_or_path: Qwen/Qwen2.5-0.5B-Instruct   # any HF causal LM in the 0.5B-3B range
+  dtype: bfloat16
+  gradient_checkpointing: true
+  use_chat_template: false                   # plain template keeps SFT/RL/eval identical
+
+lora:
+  enabled: false                             # full fine-tune at 0.5B; enable for 1.5B-3B on 24GB
+  r: 16
+  alpha: 32
+
+data:
+  train_files: [data/sample/math_train.jsonl, data/sample/code_train.jsonl]
+  eval_files: [data/sample/math_eval.jsonl, data/sample/code_eval.jsonl]
+  max_prompt_len: 384
+  max_target_len: 512
+
+optim:
+  lr: 1.0e-5
+  weight_decay: 0.0
+  warmup_steps: 20
+  scheduler: cosine
+  max_grad_norm: 1.0
+
+sft:
+  epochs: 2
+  batch_size: 8
+  grad_accum: 2
+  eval_every: 25
+  save_dir: runs/sft/final
+
+eval:
+  contamination: {ngram: 8, threshold: 0.5, mask_numbers: true}

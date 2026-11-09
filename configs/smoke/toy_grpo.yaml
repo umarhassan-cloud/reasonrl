@@ -1,0 +1,12 @@
+base: grpo_tiny.yaml
+name: toy
+output_dir: runs/toy
+data:
+  train_files: [data/sample/toy_add_train.jsonl]
+  eval_files: [data/sample/toy_add_eval.jsonl]
+optim: {lr: 2.0e-4}
+grpo: {init_from: runs/toy/sft, steps: 40, prompts_per_step: 8, group_size: 8, minibatch_size: 64,
+       max_new_tokens: 64, eval_every: 10, save_dir: runs/toy/grpo}
+eval:
+  max_new_tokens: 64
+  contamination: {ngram: 8, threshold: 0.5, mask_numbers: false}

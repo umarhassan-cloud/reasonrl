@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reasonrl"
+version = "0.1.0"
+description = "SFT -> GRPO vs DPO post-training of small LMs with verifiable math/code rewards, reward-hacking guards and contamination checks."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+keywords = ["llm", "reinforcement-learning", "grpo", "dpo", "rlvr", "post-training", "reasoning"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "torch>=2.1",
+  "transformers>=4.40",
+  "datasets>=2.18",
+  "pyyaml>=6.0",
+  "numpy>=1.24",
+  "sympy>=1.12",
+]
+
+[project.optional-dependencies]
+lora = ["peft>=0.10"]
+accel = ["accelerate>=0.28"]
+dev = ["pytest>=7.4", "ruff>=0.4"]
+
+[project.urls]
+Homepage = "https://github.com/umarhassan-cloud/reasonrl"
+Documentation = "https://github.com/umarhassan-cloud/reasonrl/blob/main/PAPER.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning", "ignore::FutureWarning"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B905", "B023"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["reasonrl"]

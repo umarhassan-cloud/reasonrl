@@ -1,0 +1,11 @@
+base: ../grpo.yaml
+name: smoke
+device: cpu
+output_dir: runs/smoke
+model: {name_or_path: tiny-random, dtype: float32, gradient_checkpointing: false}
+data: {max_prompt_len: 512}
+optim: {lr: 1.0e-4, warmup_steps: 0}
+reward: {code_workers: 4}
+grpo: {init_from: runs/smoke/sft, steps: 30, prompts_per_step: 4, group_size: 4, minibatch_size: 16,
+       max_new_tokens: 96, eval_every: 10, save_dir: runs/smoke/grpo}
+eval: {max_new_tokens: 96, batch_size: 32}

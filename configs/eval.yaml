@@ -1,0 +1,33 @@
+# Shared evaluation protocol: same prompts, decoding, budget and seed for every checkpoint.
+name: eval
+seed: 1234
+device: auto
+
+model:
+  name_or_path: Qwen/Qwen2.5-0.5B-Instruct    # used for tokenizer/dtype defaults only
+  dtype: bfloat16
+
+data:
+  train_files: [data/sample/math_train.jsonl, data/sample/code_train.jsonl]
+  eval_files: [data/sample/math_eval.jsonl, data/sample/code_eval.jsonl]
+  max_prompt_len: 384
+
+reward:                       # eval reads *correctness* only; shaping weights are irrelevant here
+  strict_extraction: true
+  code_timeout_s: 3.0
+
+eval:
+  checkpoints:                # add `base: Qwen/Qwen2.5-0.5B-Instruct` to include the untuned model
+    sft: runs/sft/final
+    sft+grpo: runs/grpo/final
+    sft+dpo: runs/dpo/final
+  baseline: sft
+  n_samples: 1                # greedy pass@1; for pass@k use n_samples=8, temperature=0.7
+  k_values: [1]
+  temperature: 0.0
+  max_new_tokens: 384
+  batch_size: 32
+  use_clean_subset: true      # report on decontaminated items only
+  bootstrap_samples: 2000
+  output_path: runs/eval/results.json
+  contamination: {ngram: 8, threshold: 0.5, mask_numbers: true}

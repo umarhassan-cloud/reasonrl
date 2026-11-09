@@ -1,0 +1,11 @@
+base: ../eval.yaml
+name: smoke
+device: cpu
+model: {name_or_path: tiny-random, dtype: float32}
+data: {max_prompt_len: 512}
+eval:
+  checkpoints: {sft: runs/smoke/sft, sft+grpo: runs/smoke/grpo, sft+dpo: runs/smoke/dpo}
+  baseline: sft
+  max_new_tokens: 96
+  output_path: runs/smoke/eval/results.json
+  bootstrap_samples: 1000

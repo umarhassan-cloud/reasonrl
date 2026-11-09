@@ -1,0 +1,11 @@
+base: dpo_tiny.yaml
+name: toy
+output_dir: runs/toy
+data:
+  train_files: [data/sample/toy_add_train.jsonl]
+  eval_files: [data/sample/toy_add_eval.jsonl]
+  max_target_len: 64
+dpo: {init_from: runs/toy/sft, samples_per_prompt: 8, max_new_tokens: 64, epochs: 2, batch_size: 8,
+      gold_as_chosen: false, save_dir: runs/toy/dpo}
+eval:
+  contamination: {ngram: 8, threshold: 0.5, mask_numbers: false}

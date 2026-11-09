@@ -1,0 +1,11 @@
+# CPU smoke run: tiny random GPT-2 + char tokenizer. Exercises the full pipeline in ~1-2 min.
+base: ../sft.yaml
+name: smoke
+device: cpu
+output_dir: runs/smoke
+log_every: 20
+model: {name_or_path: tiny-random, dtype: float32, gradient_checkpointing: false,
+        tiny: {n_embd: 128, n_layer: 2, n_head: 4, n_positions: 1024}}
+data: {max_prompt_len: 512, max_target_len: 256}
+optim: {lr: 3.0e-3, warmup_steps: 10, scheduler: cosine}
+sft: {epochs: 1, max_steps: 150, batch_size: 16, grad_accum: 1, eval_every: 50, save_dir: runs/smoke/sft}
